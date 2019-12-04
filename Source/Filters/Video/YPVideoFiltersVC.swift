@@ -27,16 +27,18 @@ public class YPVideoFiltersVC: UIViewController, IsMediaFilterVC {
     private var playbackTimeCheckerTimer: Timer?
     private var imageGenerator: AVAssetImageGenerator?
     private var isFromSelectionVC = false
+    private var isCoverDisabled: Bool = false
     
     var didSave: ((YPMediaItem) -> Void)?
     var didCancel: (() -> Void)?
-
+    
     /// Designated initializer
     public class func initWith(video: YPMediaVideo,
-                               isFromSelectionVC: Bool) -> YPVideoFiltersVC {
+                               isFromSelectionVC: Bool, isCoverSelectionEnabled: Bool = true) -> YPVideoFiltersVC {
         let vc = YPVideoFiltersVC(nibName: "YPVideoFiltersVC", bundle: Bundle(for: YPVideoFiltersVC.self))
         vc.inputVideo = video
         vc.isFromSelectionVC = isFromSelectionVC
+        vc.isCoverDisabled = !isCoverSelectionEnabled
         
         return vc
     }
@@ -60,6 +62,11 @@ public class YPVideoFiltersVC: UIViewController, IsMediaFilterVC {
 
         trimBottomItem.button.addTarget(self, action: #selector(selectTrim), for: .touchUpInside)
         coverBottomItem.button.addTarget(self, action: #selector(selectCover), for: .touchUpInside)
+        
+        if isCoverDisabled {
+            trimBottomItem.isHidden = true
+            coverBottomItem.isHidden = true
+        }
         
         // Remove the default and add a notification to repeat playback from the start
         videoView.removeReachEndObserver()
@@ -165,6 +172,10 @@ public class YPVideoFiltersVC: UIViewController, IsMediaFilterVC {
     }
     
     @objc public func selectCover() {
+        if isCoverDisabled {
+            return
+        }
+        
         title = YPConfig.wordings.cover
         
         trimBottomItem.deselect()
