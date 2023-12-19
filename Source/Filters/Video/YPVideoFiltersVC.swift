@@ -14,11 +14,12 @@ import Stevia
 public final class YPVideoFiltersVC: UIViewController, IsMediaFilterVC {
 
     /// Designated initializer
-    public class func initWith(video: YPMediaVideo,
-                               isFromSelectionVC: Bool) -> YPVideoFiltersVC {
+    public class func initWith(video: YPMediaVideo, isFromSelectionVC: Bool, isCoverSelectionEnabled: Bool = true) -> YPVideoFiltersVC {
         let vc = YPVideoFiltersVC()
         vc.inputVideo = video
         vc.isFromSelectionVC = isFromSelectionVC
+        vc.isCoverDisabled = !isCoverSelectionEnabled
+        
         return vc
     }
 
@@ -34,7 +35,8 @@ public final class YPVideoFiltersVC: UIViewController, IsMediaFilterVC {
     private var playbackTimeCheckerTimer: Timer?
     private var imageGenerator: AVAssetImageGenerator?
     private var isFromSelectionVC = false
-
+    private var isCoverDisabled: Bool = false
+    
     private let trimmerContainerView: UIView = {
         let v = UIView()
         return v
@@ -54,14 +56,16 @@ public final class YPVideoFiltersVC: UIViewController, IsMediaFilterVC {
         v.isHidden = true
         return v
     }()
-    private lazy var trimBottomItem: YPMenuItem = {
+    private lazy var trimBottomItem: YPMenuItem = { [unowned self] in
         let v = YPMenuItem()
+        v.isHidden = self.isCoverDisabled
         v.textLabel.text = YPConfig.wordings.trim
         v.button.addTarget(self, action: #selector(selectTrim), for: .touchUpInside)
         return v
     }()
-    private lazy var coverBottomItem: YPMenuItem = {
+    private lazy var coverBottomItem: YPMenuItem = { [unowned self] in
         let v = YPMenuItem()
+        v.isHidden = self.isCoverDisabled
         v.textLabel.text = YPConfig.wordings.cover
         v.button.addTarget(self, action: #selector(selectCover), for: .touchUpInside)
         return v
@@ -244,6 +248,10 @@ public final class YPVideoFiltersVC: UIViewController, IsMediaFilterVC {
     }
     
     @objc private func selectCover() {
+        if isCoverDisabled {
+            return
+        }
+        
         title = YPConfig.wordings.cover
         
         trimBottomItem.deselect()
