@@ -68,6 +68,9 @@ public struct YPImagePickerConfiguration {
     /// Adds a Video Trimmer step in the video taking process.  Defaults to true
     public var showsVideoTrimmer = true
     
+    /// Adds a Video cover selection step in the video taking process. Requires showsVideoTrimmer to be true.  Defaults to true
+    public var showsVideoCoverSelection = true
+    
     /// Enables you to opt out from saving new (or old but filtered) images to the
     /// user's photo library. Defaults to true.
     public var shouldSaveNewPicturesToAlbum = true
