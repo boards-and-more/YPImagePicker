@@ -13,14 +13,7 @@ internal struct YPPermissionManager {
 
     static func checkLibraryPermissionAndAskIfNeeded(sourceVC: UIViewController,
                                                      completion: @escaping YPPermissionManagerCompletion) {
-        var status: PHAuthorizationStatus
-
-        if #available(iOS 14, *) {
-            status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
-        } else {
-            status = PHPhotoLibrary.authorizationStatus()
-        }
-
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
         switch status {
         case .authorized:
             completion(true)
@@ -33,17 +26,9 @@ internal struct YPPermissionManager {
             sourceVC.present(alert, animated: true, completion: nil)
         case .notDetermined:
             // Show permission popup and get new status
-            if #available(iOS 14, *) {
-                PHPhotoLibrary.requestAuthorization(for: .readWrite) { s in
-                    DispatchQueue.main.async {
-                        completion(s == .authorized || s == .limited)
-                    }
-                }
-            } else {
-                PHPhotoLibrary.requestAuthorization { s in
-                    DispatchQueue.main.async {
-                        completion(s == .authorized)
-                    }
+            PHPhotoLibrary.requestAuthorization(for: .readWrite) { s in
+                DispatchQueue.main.async {
+                    completion(s == .authorized || s == .limited)
                 }
             }
         @unknown default:
@@ -72,6 +57,51 @@ internal struct YPPermissionManager {
             }
         @unknown default:
             ypLog("Bug. Write to developers please.")
+        }
+    }
+
+    static func checkMicrophonePermissionAndAskIfNeeded(sourceVC: UIViewController,
+                                                        completion: @escaping YPPermissionManagerCompletion) {
+        if #available(iOS 17, *) {
+            let permission = AVAudioApplication.shared.recordPermission
+
+            switch permission {
+            case .granted:
+                completion(true)
+            case .denied:
+                let alert = YPPermissionDeniedPopup.buildGoToSettingsAlert(cancelBlock: {
+                    completion(false)
+                })
+                sourceVC.present(alert, animated: true, completion: nil)
+            case .undetermined:
+                AVAudioApplication.requestRecordPermission { granted in
+                    DispatchQueue.main.async {
+                        completion(granted)
+                    }
+                }
+            @unknown default:
+                ypLog("Bug. Write to developers please.")
+            }
+        } else {
+            let permission = AVAudioSession.sharedInstance().recordPermission
+
+            switch permission {
+            case .granted:
+                completion(true)
+            case .denied:
+                let alert = YPPermissionDeniedPopup.buildGoToSettingsAlert(cancelBlock: {
+                    completion(false)
+                })
+                sourceVC.present(alert, animated: true, completion: nil)
+            case .undetermined:
+                AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                    DispatchQueue.main.async {
+                        completion(granted)
+                    }
+                }
+            @unknown default:
+                ypLog("Bug. Write to developers please.")
+            }
         }
     }
 }

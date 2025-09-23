@@ -72,9 +72,9 @@ open class YPImagePicker: UINavigationController {
         }
         viewControllers = [picker]
         setupLoadingView()
-        navigationBar.isTranslucent = false
-        navigationBar.tintColor = .ypLabel
-        view.backgroundColor = .ypSystemBackground
+        navigationBar.configureNavigationBar(isTransculent: false, tintColor: YPImagePickerConfiguration.shared.colors.tintColor)
+        navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : YPImagePickerConfiguration.shared.colors.tintColor]
+        view.backgroundColor = YPImagePickerConfiguration.shared.colors.safeAreaBackgroundColor
 
         picker.didSelectItems = { [weak self] items in
             // Use Fade transition instead of default push animation

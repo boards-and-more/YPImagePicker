@@ -20,7 +20,10 @@ public struct YPImagePickerConfiguration {
     public static var widthOniPad: CGFloat = -1
     
     public static var screenWidth: CGFloat {
-		var screenWidth: CGFloat = UIScreen.main.bounds.width
+        var screenWidth: CGFloat = 0
+        
+        let windowScene = UIApplication.safeFirstWindowScene
+        screenWidth = windowScene?.screen.bounds.width ?? 1.0
 		if UIDevice.current.userInterfaceIdiom == .pad && YPImagePickerConfiguration.widthOniPad > 0 {
 			screenWidth =  YPImagePickerConfiguration.widthOniPad
 		}
@@ -121,6 +124,9 @@ public struct YPImagePickerConfiguration {
     /// Defines the max camera zoom factor for camera. Disable camera zoom with 1. Default is 1.
     public var maxCameraZoomFactor: CGFloat = 1.0
     
+    /// Controls the camera shutter sound. If set to true, the camera shutter sound will be disabled. Defaults to false.
+    public var silentMode = false
+    
     /// List of default filters which will be added on the filter screen
     public var filters: [YPFilter] = [
         YPFilter(name: "Normal", applier: nil),
@@ -209,6 +215,19 @@ public struct YPConfigVideo {
     
     /// Choose the result video extension if you trim or compress a video. Defaults to mov.
     public var fileType: AVFileType = .mov
+    
+    /// Set this value for the `AVAssetExportSession` property `fileLengthLimit`
+    /// May be useful for exporting video with original format `mp4`
+    ///
+    /// Sometimes `AVAssetExportSession` increase mp4 video bitrate
+    /// so result file might be quite bigger than original from user gallery
+    ///
+    /// Usage example - setting `fileLengthLimit` to `10 MB`:
+    /// ``` swift
+    /// config.video.fileLengthLimit = 1048576 * 10
+    /// ```
+    /// For more information check [this thread](https://stackoverflow.com/questions/50560922/reducing-the-size-of-a-video-exported-with-avassetexportsession-ios-swift)
+    public var fileLengthLimit: Int64?
     
     /// Defines the time limit for recording videos.
     /// Default is 60 seconds.

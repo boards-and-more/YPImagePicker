@@ -102,7 +102,7 @@ open class YPPhotoFiltersVC: UIViewController, IsMediaFilterVC, UIGestureRecogni
     // MARK: Setup - ⚙️
     
     fileprivate func setupRightBarButton() {
-        let rightBarButtonTitle = isFromSelectionVC ? YPConfig.wordings.done : YPConfig.wordings.next
+        let rightBarButtonTitle = isFromSelectionVC ? YPConfig.wordings.done : YPWordings().computeNavigationRightButtonText(step: .filter)
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: rightBarButtonTitle,
                                                             style: .done,
                                                             target: self,
@@ -126,7 +126,7 @@ open class YPPhotoFiltersVC: UIViewController, IsMediaFilterVC, UIGestureRecogni
     
     fileprivate func thumbFromImage(_ img: UIImage) -> CIImage {
         let k = img.size.width / img.size.height
-        let scale = UIScreen.main.scale
+        let scale = view.window?.windowScene?.screen.scale ?? 1.0
         let thumbnailHeight: CGFloat = 300 * scale
         let thumbnailWidth = thumbnailHeight * k
         let thumbnailSize = CGSize(width: thumbnailWidth, height: thumbnailHeight)

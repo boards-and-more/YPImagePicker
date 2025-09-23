@@ -53,6 +53,16 @@ extension YPLibraryVC {
     }
     
     // MARK: - Library collection view cell managing
+    private func getSelectedIndexPaths(selectedItems: [YPLibrarySelection]) -> [IndexPath] {
+        let collectionViewItemsCount = v.collectionView.numberOfItems(inSection: 0)
+        var selectedIndexPaths = [IndexPath]()
+        for item in selectedItems {
+            if item.index < collectionViewItemsCount {
+                selectedIndexPaths.append(IndexPath(row: item.index, section: 0))
+            }
+        }
+        return Array(Set(selectedIndexPaths))
+    }
     
     /// Removes cell from selection
     func deselect(indexPath: IndexPath) {
@@ -62,7 +72,7 @@ extension YPLibraryVC {
             selectedItems.remove(at: positionIndex)
 
             // Refresh the numbers
-            let selectedIndexPaths = selectedItems.map { IndexPath(row: $0.index, section: 0) }
+            let selectedIndexPaths = getSelectedIndexPaths(selectedItems: selectedItems)
             v.collectionView.reloadItems(at: selectedIndexPaths)
 			
             // Replace the current selected image with the previously selected one
@@ -168,7 +178,6 @@ extension YPLibraryVC: UICollectionViewDelegate {
         let previouslySelectedIndexPath = IndexPath(row: currentlySelectedIndex, section: 0)
         currentlySelectedIndex = indexPath.row
 
-        changeAsset(mediaManager.getAsset(at: indexPath.row))
         panGestureHelper.resetToOriginalState()
         
         // Only scroll cell to top if preview is hidden.
@@ -183,13 +192,17 @@ extension YPLibraryVC: UICollectionViewDelegate {
             if cellIsInTheSelectionPool {
                 if cellIsCurrentlySelected {
                     deselect(indexPath: indexPath)
+                } else {
+                    changeAsset(mediaManager.getAsset(at: indexPath.row))
                 }
             } else if isLimitExceeded == false {
                 addToSelection(indexPath: indexPath)
+                changeAsset(mediaManager.getAsset(at: indexPath.row))
             }
             collectionView.reloadItems(at: [indexPath])
             collectionView.reloadItems(at: [previouslySelectedIndexPath])
         } else {
+            changeAsset(mediaManager.getAsset(at: indexPath.row))
             selectedItems.removeAll()
             addToSelection(indexPath: indexPath)
             

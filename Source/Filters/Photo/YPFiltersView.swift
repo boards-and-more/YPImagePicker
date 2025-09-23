@@ -19,7 +19,7 @@ class YPFiltersView: UIView {
     convenience init() {
         self.init(frame: CGRect.zero)
         collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout())
-        filtersLoader = UIActivityIndicatorView(style: .gray)
+        filtersLoader = UIActivityIndicatorView(style: .medium)
         filtersLoader.hidesWhenStopped = true
         filtersLoader.startAnimating()
         filtersLoader.color = YPConfig.colors.tintColor
@@ -32,7 +32,8 @@ class YPFiltersView: UIView {
             )
         )
         
-        let isIphone4 = UIScreen.main.bounds.height == 480
+        let height = window?.windowScene?.screen.bounds.height ?? .zero
+        let isIphone4 = height == 480
         let sideMargin: CGFloat = isIphone4 ? 20 : 0
         
         |-sideMargin-imageView.top(0)-sideMargin-|

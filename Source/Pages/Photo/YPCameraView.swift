@@ -50,7 +50,8 @@ internal class YPCameraView: UIView, UIGestureRecognizerDelegate {
         }
         
         // Layout
-        let isIphone4 = UIScreen.main.bounds.height == 480
+        let height = window?.windowScene?.screen.bounds.height ?? .zero
+        let isIphone4 = height == 480
         let sideMargin: CGFloat = isIphone4 ? 20 : 0
         if YPConfig.onlySquareImagesFromCamera {
             layout(

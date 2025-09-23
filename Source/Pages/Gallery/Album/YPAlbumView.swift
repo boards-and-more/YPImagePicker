@@ -12,11 +12,17 @@ import Stevia
 class YPAlbumView: UIView {
     
     let tableView = UITableView()
-    let spinner = UIActivityIndicatorView(style: .gray)
+    let spinner = UIActivityIndicatorView(style: .medium)
     
     convenience init() {
         self.init(frame: .zero)
         
+        let spinnerColor = UIColor { trait -> UIColor in
+            return trait.userInterfaceStyle == .dark ? .white : .gray
+        }
+        spinner.color = spinnerColor
+        spinner.style = .large
+
         subviews(
             tableView,
             spinner

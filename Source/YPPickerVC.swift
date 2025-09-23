@@ -280,7 +280,8 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
         switch mode {
         case .library:
             setTitleViewWithTitle(aTitle: libraryVC?.title ?? "")
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: YPConfig.wordings.next,
+            let title = YPWordings().computeNavigationRightButtonText(step: .pick)
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: title,
                                                                 style: .done,
                                                                 target: self,
                                                                 action: #selector(done))
@@ -367,11 +368,7 @@ extension YPPickerVC: YPLibraryViewDelegate {
     }
     
     public func libraryViewDidToggleMultipleSelection(enabled: Bool) {
-        var offset = v.header.frame.height
-        if #available(iOS 11.0, *) {
-            offset += v.safeAreaInsets.bottom
-        }
-        
+        let offset = v.header.frame.height + v.safeAreaInsets.bottom
         v.header.bottomConstraint?.constant = enabled ? offset : 0
         v.layoutIfNeeded()
         updateUI()

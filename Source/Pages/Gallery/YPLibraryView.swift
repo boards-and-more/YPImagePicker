@@ -109,18 +109,11 @@ internal final class YPLibraryView: UIView {
     func fadeInLoader() {
         shouldShowLoader = true
         // Only show loader if full res image takes more than 0.5s to load.
-        if #available(iOS 10.0, *) {
-            Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { _ in
-                if self.shouldShowLoader == true {
-                    UIView.animate(withDuration: 0.2) {
-                        self.assetViewContainer.spinnerView.alpha = 1
-                    }
+        Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { _ in
+            if self.shouldShowLoader == true {
+                UIView.animate(withDuration: 0.2) {
+                    self.assetViewContainer.spinnerView.alpha = 1
                 }
-            }
-        } else {
-            // Fallback on earlier versions
-            UIView.animate(withDuration: 0.2) {
-                self.assetViewContainer.spinnerView.alpha = 1
             }
         }
     }
@@ -156,11 +149,12 @@ internal final class YPLibraryView: UIView {
     }
 
     func cellSize() -> CGSize {
-        var screenWidth: CGFloat = UIScreen.main.bounds.width
+        var screenWidth = window?.windowScene?.screen.bounds.width ?? 1.0
+        let scale = window?.windowScene?.screen.scale ?? 1.0
         if UIDevice.current.userInterfaceIdiom == .pad && YPImagePickerConfiguration.widthOniPad > 0 {
             screenWidth =  YPImagePickerConfiguration.widthOniPad
         }
-        let size = screenWidth / 4 * UIScreen.main.scale
+        let size = screenWidth / 4 * scale
         return CGSize(width: size, height: size)
     }
 
