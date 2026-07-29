@@ -60,6 +60,7 @@ open class YPImagePicker: UINavigationController {
     // Multiple selection becomes available as an opt-in.
     private func didSelect(items: [YPMediaItem]) {
         _didFinishPicking?(items, false)
+        _didFinishPicking = nil // Avoid retaining the picker via a strongly-captured closure.
     }
     
     private let loadingView = YPLoadingView()
@@ -69,6 +70,7 @@ open class YPImagePicker: UINavigationController {
         super.viewDidLoad()
         picker.didClose = { [weak self] in
             self?._didFinishPicking?([], true)
+            self?._didFinishPicking = nil
         }
         viewControllers = [picker]
         setupLoadingView()
@@ -108,7 +110,14 @@ open class YPImagePicker: UINavigationController {
                     if YPConfig.shouldSaveNewPicturesToAlbum {
                         let isModified = photo.modifiedImage != nil
                         if photo.fromCamera || (!photo.fromCamera && isModified) {
-                            YPPhotoSaver.trySaveImage(photo.image, inAlbumNamed: YPConfig.albumName)
+                            YPPhotoSaver.trySaveImage(photo.image, inAlbumNamed: YPConfig.albumName) { asset in
+                                // Camera photos have no PHAsset yet; attach the one just saved.
+                                if photo.asset == nil {
+                                    photo.asset = asset
+                                }
+                                self?.didSelect(items: [mediaItem])
+                            }
+                            return
                         }
                     }
                     self?.didSelect(items: [mediaItem])

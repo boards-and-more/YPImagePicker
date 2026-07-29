@@ -77,7 +77,11 @@ final class YPAssetZoomableView: UIScrollView {
             strongSelf.setAssetFrame(for: strongSelf.videoView, with: preview)
 
             strongSelf.squaredZoomScale = strongSelf.calculateSquaredZoomScale()
-            
+
+            if YPConfig.library.onlySquare {
+                strongSelf.fitImage(true)
+            }
+
             completion()
             
             // Stored crop position in multiple selection
@@ -111,7 +115,11 @@ final class YPAssetZoomableView: UIScrollView {
         
         mediaManager.imageManager?.fetch(photo: photo) { [weak self] image, isLowResIntermediaryImage in
             guard let strongSelf = self else { return }
-            
+            guard let image = image else {
+                completion(false)
+                return
+            }
+
             if strongSelf.photoImageView.isDescendant(of: strongSelf) == false {
                 strongSelf.isVideoMode = false
                 strongSelf.videoView.removeFromSuperview()
@@ -135,7 +143,11 @@ final class YPAssetZoomableView: UIScrollView {
             }
 
             strongSelf.squaredZoomScale = strongSelf.calculateSquaredZoomScale()
-            
+
+            if YPConfig.library.onlySquare {
+                strongSelf.fitImage(true)
+            }
+
             completion(isLowResIntermediaryImage)
         }
     }

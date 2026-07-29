@@ -396,7 +396,7 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable {
     
     private func fetchImageAndCrop(for asset: PHAsset,
                                    withCropRect: CGRect? = nil,
-                                   callback: @escaping (_ photo: UIImage, _ exif: [String: Any]) -> Void) {
+                                   callback: @escaping (_ photo: UIImage?, _ exif: [String: Any]) -> Void) {
         delegate?.libraryViewDidTapNext()
         let cropRect = withCropRect ?? DispatchQueue.main.sync { v.currentCropRect() }
         let ts = targetSize(for: asset, cropRect: cropRect)
@@ -416,6 +416,7 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable {
                                     height: ts.height)
         
         guard fitsVideoLengthLimits(asset: asset) else {
+            callback(nil)
             return
         }
         
@@ -468,6 +469,9 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable {
                 
                 // Fill result media items array
                 var resultMediaItems: [YPMediaItem] = []
+                let resultMediaItemsLock = NSLock()
+                // Run heavy video exports one at a time to keep peak memory bounded.
+                let videoExportSemaphore = DispatchSemaphore(value: 1)
                 let asyncGroup = DispatchGroup()
                 
                 var assetDictionary: [PHAsset?: Int] = .init()
@@ -481,26 +485,37 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable {
                     switch asset.asset.mediaType {
                     case .image:
                         self.fetchImageAndCrop(for: asset.asset, withCropRect: asset.cropRect) { image, exifMeta in
+                            guard let image = image else {
+                                ypLog("Problems with fetching image.")
+                                asyncGroup.leave()
+                                return
+                            }
                             let photo = YPMediaPhoto(image: image.resizedImageIfNeeded(),
 													 exifMeta: exifMeta, asset: asset.asset)
+                            resultMediaItemsLock.lock()
                             resultMediaItems.append(YPMediaItem.photo(p: photo))
+                            resultMediaItemsLock.unlock()
                             asyncGroup.leave()
                         }
                         
                     case .video:
+                        videoExportSemaphore.wait()
                         self.fetchVideoAndApplySettings(for: asset.asset,
                                                              withCropRect: asset.cropRect) { videoURL in
                             if let videoURL = videoURL {
                                 let videoItem = YPMediaVideo(thumbnail: thumbnailFromVideoPath(videoURL),
                                                              videoURL: videoURL, asset: asset.asset)
+                                resultMediaItemsLock.lock()
                                 resultMediaItems.append(YPMediaItem.video(v: videoItem))
+                                resultMediaItemsLock.unlock()
                             } else {
                                 ypLog("Problems with fetching videoURL.")
                             }
+                            videoExportSemaphore.signal()
                             asyncGroup.leave()
                         }
                     default:
-                        break
+                        asyncGroup.leave()
                     }
                 }
                 
@@ -537,7 +552,11 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable {
                     self.delegate?.libraryViewFinishedLoading()
                 }
             } else {
-                let asset = selectedAssets.first!.asset
+                guard let asset = selectedAssets.first?.asset else {
+  					ypLog("No asset found in selection")
+  					return
+  				}
+				
                 switch asset.mediaType {
                 case .audio, .unknown:
                     return
@@ -558,6 +577,10 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable {
                     self.fetchImageAndCrop(for: asset) { image, exifMeta in
                         DispatchQueue.main.async {
                             self.delegate?.libraryViewFinishedLoading()
+                            guard let image = image else {
+                                ypLog("Problems with fetching image.")
+                                return
+                            }
                             let photo = YPMediaPhoto(image: image.resizedImageIfNeeded(),
                                                      exifMeta: exifMeta,
                                                      asset: asset)
