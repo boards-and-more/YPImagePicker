@@ -15,6 +15,8 @@ import Photos
 internal var YPConfig: YPImagePickerConfiguration { return YPImagePickerConfiguration.shared }
 
 public struct YPImagePickerConfiguration {
+    public typealias ButtonProvider = (_ controller: UIViewController, _ position: BarButtonItemPosition) -> [UIBarButtonItem]?
+    
     public static var shared: YPImagePickerConfiguration = YPImagePickerConfiguration()
     
     public static var widthOniPad: CGFloat = -1
@@ -55,6 +57,9 @@ public struct YPImagePickerConfiguration {
     /// Use this property to modify the default fonts provided
     public var fonts = YPFonts()
 
+    /// Overrides ALL left and right bar button items with objects (or nil for default back) from this provider.
+    public var barButtonItemProvider: ButtonProvider?
+    
     /// Scroll to change modes, defaults to true
     public var isScrollToChangeModesEnabled = true
 
@@ -102,6 +107,9 @@ public struct YPImagePickerConfiguration {
     /// Adds a Overlay View to the camera
     public var overlayView: UIView?
 
+    /// Configure the scroll edge appearance of the navigation bar with default background and set navigation bar non-translucent (not iOS default!).
+    public var opaqueScrollEdgeNavigationBar = true
+    
     /// Defines if the navigation bar cancel button should be hidden when showing the picker. Default is false
     public var hidesCancelButton = false
     
@@ -145,7 +153,12 @@ public struct YPImagePickerConfiguration {
         YPFilter(name: "Linear", coreImageFilterName: "CISRGBToneCurveToLinear"),
         YPFilter(name: "Sepia", coreImageFilterName: "CISepiaTone"),
         YPFilter(name: "XRay", coreImageFilterName: "CIXRay")
-        ]
+    ]
+    
+    public enum BarButtonItemPosition: Int {
+        case left
+        case right
+    }
 }
 
 /// Encapsulates library specific settings.

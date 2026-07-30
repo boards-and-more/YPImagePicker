@@ -40,14 +40,19 @@ public class YPSelectionsGalleryVC: UIViewController, YPSelectionsGalleryCellDel
         v.collectionView.delegate = self
         
         // Setup navigation bar
-        let title = YPWordings().computeNavigationRightButtonText(step: .multipleGallary)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: title,
-                                                            style: .done,
-                                                            target: self,
-                                                            action: #selector(done))
-        navigationItem.rightBarButtonItem?.tintColor = YPConfig.colors.tintColor
-        navigationItem.rightBarButtonItem?.setFont(font: YPConfig.fonts.rightBarButtonFont, forState: .disabled)
-        navigationItem.rightBarButtonItem?.setFont(font: YPConfig.fonts.rightBarButtonFont, forState: .normal)
+        if let buttonItemProvider = YPConfig.barButtonItemProvider {
+            navigationItem.leftBarButtonItems = buttonItemProvider(self, .right)
+        } else {
+            let title = YPWordings().computeNavigationRightButtonText(step: .multipleGallary)
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: title,
+                                                                style: .done,
+                                                                target: self,
+                                                                action: #selector(done))
+            navigationItem.rightBarButtonItem?.tintColor = YPConfig.colors.tintColor
+            navigationItem.rightBarButtonItem?.setFont(font: YPConfig.fonts.rightBarButtonFont, forState: .disabled)
+            navigationItem.rightBarButtonItem?.setFont(font: YPConfig.fonts.rightBarButtonFont, forState: .normal)
+        }
+        
         navigationController?.navigationBar.setTitleFont(font: YPConfig.fonts.navigationBarTitleFont)
         
         YPHelper.changeBackButtonIcon(self)

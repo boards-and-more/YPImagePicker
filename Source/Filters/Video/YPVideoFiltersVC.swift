@@ -133,23 +133,31 @@ public final class YPVideoFiltersVC: UIViewController, IsMediaFilterVC {
 
     private func setupNavigationBar(isFromSelectionVC: Bool) {
         if isFromSelectionVC {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(title: YPConfig.wordings.cancel,
-                                                               style: .plain,
-                                                               target: self,
-                                                               action: #selector(cancel))
-            navigationItem.leftBarButtonItem?.setFont(font: YPConfig.fonts.leftBarButtonFont, forState: .normal)
+            if let buttonItemProvider = YPConfig.barButtonItemProvider {
+                navigationItem.leftBarButtonItems = buttonItemProvider(self, .left)
+            } else {
+                navigationItem.leftBarButtonItem = UIBarButtonItem(title: YPConfig.wordings.cancel,
+                                                                   style: .plain,
+                                                                   target: self,
+                                                                   action: #selector(cancel))
+                navigationItem.leftBarButtonItem?.setFont(font: YPConfig.fonts.leftBarButtonFont, forState: .normal)
+            }
         }
         setupRightBarButtonItem()
     }
 
     private func setupRightBarButtonItem() {
-        let rightBarButtonTitle = isFromSelectionVC ? YPConfig.wordings.done : YPWordings().computeNavigationRightButtonText(step: .filter)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: rightBarButtonTitle,
-                                                            style: .done,
-                                                            target: self,
-                                                            action: #selector(save))
-        navigationItem.rightBarButtonItem?.tintColor = YPConfig.colors.tintColor
-        navigationItem.rightBarButtonItem?.setFont(font: YPConfig.fonts.rightBarButtonFont, forState: .normal)
+        if let buttonItemProvider = YPConfig.barButtonItemProvider {
+            navigationItem.leftBarButtonItems = buttonItemProvider(self, .right)
+        } else {
+            let rightBarButtonTitle = isFromSelectionVC ? YPConfig.wordings.done : YPWordings().computeNavigationRightButtonText(step: .filter)
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: rightBarButtonTitle,
+                                                                style: .done,
+                                                                target: self,
+                                                                action: #selector(save))
+            navigationItem.rightBarButtonItem?.tintColor = YPConfig.colors.tintColor
+            navigationItem.rightBarButtonItem?.setFont(font: YPConfig.fonts.rightBarButtonFont, forState: .normal)
+        }
     }
 
     private func setupLayout() {

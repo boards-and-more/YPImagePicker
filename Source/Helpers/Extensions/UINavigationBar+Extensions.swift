@@ -15,9 +15,7 @@ extension UINavigationBar {
         self.titleTextAttributes = [NSAttributedString.Key.font: font]
     }
 
-    func configureNavigationBar(isTransculent: Bool, tintColor: UIColor) {
-        self.tintColor = tintColor
-
+    func configureNavigationBar(isTransculent: Bool) {
         let appearance = standardAppearance
         if isTransculent {
             appearance.configureWithTransparentBackground()

@@ -270,23 +270,36 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
     }
     
     func updateUI() {
-        if !YPConfig.hidesCancelButton {
-            // Update Nav Bar state.
-            navigationItem.leftBarButtonItem = UIBarButtonItem(title: YPConfig.wordings.cancel,
-                                                               style: .plain,
-                                                               target: self,
-                                                               action: #selector(close))
+        if let buttonItemProvider = YPConfig.barButtonItemProvider {
+            navigationItem.leftBarButtonItems = buttonItemProvider(self, .left)
+        } else {
+            if !YPConfig.hidesCancelButton {
+                // Update Nav Bar state.
+                navigationItem.leftBarButtonItem = UIBarButtonItem(title: YPConfig.wordings.cancel,
+                                                                   style: .plain,
+                                                                   target: self,
+                                                                   action: #selector(close))
+            }
         }
+        
         switch mode {
         case .library:
             setTitleViewWithTitle(aTitle: libraryVC?.title ?? "")
-            let title = YPWordings().computeNavigationRightButtonText(step: .pick)
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: title,
-                                                                style: .done,
-                                                                target: self,
-                                                                action: #selector(done))
-            navigationItem.rightBarButtonItem?.tintColor = YPConfig.colors.tintColor
-
+            
+            if let buttonItemProvider = YPConfig.barButtonItemProvider {
+                navigationItem.leftBarButtonItems = buttonItemProvider(self, .right)
+            } else {
+                let title = YPWordings().computeNavigationRightButtonText(step: .pick)
+                navigationItem.rightBarButtonItem = UIBarButtonItem(title: title,
+                                                                    style: .done,
+                                                                    target: self,
+                                                                    action: #selector(done))
+                navigationItem.rightBarButtonItem?.tintColor = YPConfig.colors.tintColor
+                navigationItem.rightBarButtonItem?.setFont(font: YPConfig.fonts.rightBarButtonFont, forState: .normal)
+                navigationItem.rightBarButtonItem?.setFont(font: YPConfig.fonts.rightBarButtonFont, forState: .disabled)
+                navigationItem.leftBarButtonItem?.setFont(font: YPConfig.fonts.leftBarButtonFont, forState: .normal)
+            }
+            
             // Disable Next Button until minNumberOfItems is reached.
             navigationItem.rightBarButtonItem?.isEnabled =
                 libraryVC!.selectedItems.count >= YPConfig.library.minNumberOfItems
@@ -300,10 +313,6 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
             title = videoVC?.title
             navigationItem.rightBarButtonItem = nil
         }
-
-        navigationItem.rightBarButtonItem?.setFont(font: YPConfig.fonts.rightBarButtonFont, forState: .normal)
-        navigationItem.rightBarButtonItem?.setFont(font: YPConfig.fonts.rightBarButtonFont, forState: .disabled)
-        navigationItem.leftBarButtonItem?.setFont(font: YPConfig.fonts.leftBarButtonFont, forState: .normal)
     }
     
     @objc

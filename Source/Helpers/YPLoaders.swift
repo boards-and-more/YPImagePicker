@@ -21,6 +21,11 @@ struct YPLoaders {
             spinner.color = spinnerColor
         }
         spinner.startAnimating()
-        return UIBarButtonItem(customView: spinner)
+        
+        let item = UIBarButtonItem(customView: spinner)
+        if #available(iOS 26.0, *) {
+            item.hidesSharedBackground = true
+        }
+        return item
     }
 }
