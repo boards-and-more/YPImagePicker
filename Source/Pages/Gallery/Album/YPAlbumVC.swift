@@ -37,7 +37,7 @@ class YPAlbumVC: UIViewController {
         super.viewDidLoad()
         
         if let buttonItemProvider = YPConfig.barButtonItemProvider {
-            navigationItem.leftBarButtonItems = buttonItemProvider(self, .left)
+            navigationItem.leftBarButtonItem = buttonItemProvider(self, .left)
         } else {
             navigationItem.leftBarButtonItem = UIBarButtonItem(title: YPConfig.wordings.cancel,
                                                                style: .plain,

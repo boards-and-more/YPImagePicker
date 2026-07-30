@@ -271,7 +271,7 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
     
     func updateUI() {
         if let buttonItemProvider = YPConfig.barButtonItemProvider {
-            navigationItem.leftBarButtonItems = buttonItemProvider(self, .left)
+            navigationItem.leftBarButtonItem = buttonItemProvider(self, .left)
         } else {
             if !YPConfig.hidesCancelButton {
                 // Update Nav Bar state.
@@ -287,7 +287,10 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
             setTitleViewWithTitle(aTitle: libraryVC?.title ?? "")
             
             if let buttonItemProvider = YPConfig.barButtonItemProvider {
-                navigationItem.leftBarButtonItems = buttonItemProvider(self, .right)
+                let barButtonItem = buttonItemProvider(self, .right)
+                barButtonItem?.target = self
+                barButtonItem?.action = #selector(done)
+                navigationItem.rightBarButtonItem = barButtonItem
             } else {
                 let title = YPWordings().computeNavigationRightButtonText(step: .pick)
                 navigationItem.rightBarButtonItem = UIBarButtonItem(title: title,

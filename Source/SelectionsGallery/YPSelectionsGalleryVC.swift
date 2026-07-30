@@ -41,7 +41,10 @@ public class YPSelectionsGalleryVC: UIViewController, YPSelectionsGalleryCellDel
         
         // Setup navigation bar
         if let buttonItemProvider = YPConfig.barButtonItemProvider {
-            navigationItem.leftBarButtonItems = buttonItemProvider(self, .right)
+            let barButtonItem = buttonItemProvider(self, .right)
+            barButtonItem?.target = self
+            barButtonItem?.action = #selector(done)
+            navigationItem.rightBarButtonItem = barButtonItem
         } else {
             let title = YPWordings().computeNavigationRightButtonText(step: .multipleGallary)
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: title,

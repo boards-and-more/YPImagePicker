@@ -15,7 +15,7 @@ import Photos
 internal var YPConfig: YPImagePickerConfiguration { return YPImagePickerConfiguration.shared }
 
 public struct YPImagePickerConfiguration {
-    public typealias ButtonProvider = (_ controller: UIViewController, _ position: BarButtonItemPosition) -> [UIBarButtonItem]?
+    public typealias ButtonProvider = (_ controller: UIViewController, _ position: BarButtonItemPosition) -> UIBarButtonItem?
     
     public static var shared: YPImagePickerConfiguration = YPImagePickerConfiguration()
     

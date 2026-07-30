@@ -134,7 +134,7 @@ public final class YPVideoFiltersVC: UIViewController, IsMediaFilterVC {
     private func setupNavigationBar(isFromSelectionVC: Bool) {
         if isFromSelectionVC {
             if let buttonItemProvider = YPConfig.barButtonItemProvider {
-                navigationItem.leftBarButtonItems = buttonItemProvider(self, .left)
+                navigationItem.leftBarButtonItem = buttonItemProvider(self, .left)
             } else {
                 navigationItem.leftBarButtonItem = UIBarButtonItem(title: YPConfig.wordings.cancel,
                                                                    style: .plain,
@@ -148,7 +148,10 @@ public final class YPVideoFiltersVC: UIViewController, IsMediaFilterVC {
 
     private func setupRightBarButtonItem() {
         if let buttonItemProvider = YPConfig.barButtonItemProvider {
-            navigationItem.leftBarButtonItems = buttonItemProvider(self, .right)
+            let barButtonItem = buttonItemProvider(self, .right)
+            barButtonItem?.target = self
+            barButtonItem?.action = #selector(save)
+            navigationItem.rightBarButtonItem = barButtonItem
         } else {
             let rightBarButtonTitle = isFromSelectionVC ? YPConfig.wordings.done : YPWordings().computeNavigationRightButtonText(step: .filter)
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: rightBarButtonTitle,
