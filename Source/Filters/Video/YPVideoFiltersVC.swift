@@ -149,8 +149,12 @@ public final class YPVideoFiltersVC: UIViewController, IsMediaFilterVC {
     private func setupRightBarButtonItem() {
         if let buttonItemProvider = YPConfig.barButtonItemProvider {
             let barButtonItem = buttonItemProvider(self, .right)
-            barButtonItem?.target = self
-            barButtonItem?.action = #selector(save)
+            if let control = barButtonItem?.customView as? UIControl {
+                control.addTarget(self, action: #selector(save), for: .touchUpInside)
+            } else {
+                barButtonItem?.target = self
+                barButtonItem?.action = #selector(save)
+            }
             navigationItem.rightBarButtonItem = barButtonItem
         } else {
             let rightBarButtonTitle = isFromSelectionVC ? YPConfig.wordings.done : YPWordings().computeNavigationRightButtonText(step: .filter)
