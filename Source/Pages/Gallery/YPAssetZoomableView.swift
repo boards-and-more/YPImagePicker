@@ -257,11 +257,9 @@ fileprivate extension YPAssetZoomableView {
         let scrollViewBoundsSize = self.bounds.size
         var assetFrame = assetView.frame
         let assetSize = assetView.frame.size
-        let contentHeight = scrollViewBoundsSize.height - self.safeAreaInsets.top
 
         assetFrame.origin.x = (assetSize.width < scrollViewBoundsSize.width) ? (scrollViewBoundsSize.width - assetSize.width) / 2.0 : 0
-
-        assetFrame.origin.y = (assetSize.height < contentHeight) ? safeAreaInsets.top + (contentHeight - assetSize.height) / 2.0 : safeAreaInsets.top
+        assetFrame.origin.y = (scrollViewBoundsSize.height - assetSize.height) / 2 + self.safeAreaInsets.top / 2
         
         assetView.frame = assetFrame
     }
