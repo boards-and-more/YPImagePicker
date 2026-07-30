@@ -182,7 +182,9 @@ internal final class YPLibraryView: UIView {
         line.height(1)
         line.fillHorizontally()
 
-        assetViewContainer.top(0).fillHorizontally().heightEqualsWidth()
+        assetViewContainer.Top == safeAreaLayoutGuide.Top
+        assetViewContainer.fillHorizontally().heightEqualsWidth()
+        
         self.assetViewContainerConstraintTop = assetViewContainer.topConstraint
         assetZoomableView.fillContainer().heightEqualsWidth()
         assetZoomableView.Bottom == collectionView.Top
