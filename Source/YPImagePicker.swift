@@ -16,7 +16,7 @@ public protocol YPImagePickerDelegate: AnyObject {
 }
 
 open class YPImagePicker: UINavigationController {
-    public typealias DidFinishPickingCompletion = (_ items: [YPMediaItem], _ cancelled: Bool) -> Void
+    public typealias DidFinishPickingCompletion = (_ picker: YPImagePicker, _ items: [YPMediaItem], _ cancelled: Bool) -> Void
 
     // MARK: - Public
 
@@ -59,8 +59,7 @@ open class YPImagePicker: UINavigationController {
     // This keeps the backwards compatibility keeps the api as simple as possible.
     // Multiple selection becomes available as an opt-in.
     private func didSelect(items: [YPMediaItem]) {
-        _didFinishPicking?(items, false)
-        _didFinishPicking = nil // Avoid retaining the picker via a strongly-captured closure.
+        _didFinishPicking?(self, items, false)
     }
     
     private let loadingView = YPLoadingView()
@@ -69,8 +68,9 @@ open class YPImagePicker: UINavigationController {
     override open func viewDidLoad() {
         super.viewDidLoad()
         picker.didClose = { [weak self] in
-            self?._didFinishPicking?([], true)
-            self?._didFinishPicking = nil
+            guard let `self` = self else { return }
+            
+            self._didFinishPicking?(self, [], true)
         }
         viewControllers = [picker]
         setupLoadingView()
