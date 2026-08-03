@@ -21,7 +21,17 @@ final class YPCropView: UIView {
     let cropArea = YPCropAreaView()
     let grid = YPGridView()
 
+    var hideToolbar: Bool = false {
+        didSet {
+            toolbar.isHidden = hideToolbar
+            toolbarHeightConstraint?.constant = hideToolbar ? 0 : Self.toolbarHeight
+        }
+    }
+    
+    private static let toolbarHeight: CGFloat = 44
+    
     private let defaultCurtainPadding: CGFloat = 15
+    
     private var isCircle: Bool {
         if case YPCropType.circle = YPConfig.showsCrop {
             return true
@@ -29,6 +39,8 @@ final class YPCropView: UIView {
         return false
     }
 
+    private var toolbarHeightConstraint: NSLayoutConstraint?
+    
     convenience init(image: UIImage) {
         
         self.init(frame: .zero)
@@ -95,7 +107,7 @@ final class YPCropView: UIView {
         layout(
             0,
             |containerView|,
-            |toolbar| ~ 44
+            |toolbar|
         )
         
         layout(
@@ -106,6 +118,8 @@ final class YPCropView: UIView {
             0
         )
     
+        toolbarHeightConstraint = (toolbar.Height == Self.toolbarHeight)
+        
         toolbar.Bottom == safeAreaLayoutGuide.Bottom
                 
         let complementRatio: CGFloat = CGFloat(1.0 / ratio)
