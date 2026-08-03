@@ -47,7 +47,14 @@ class YPCropVC: UIViewController {
     func setupToolbar() {
         if let buttonItemProvider = YPConfig.barButtonItemProvider {
             v.hideToolbar = true
-            navigationItem.rightBarButtonItem = buttonItemProvider(self, .right)
+            let barButtonItem = buttonItemProvider(self, .right)
+            if let control = barButtonItem?.customView as? UIControl {
+                control.addTarget(self, action: #selector(done), for: .touchUpInside)
+            } else {
+                barButtonItem?.target = self
+                barButtonItem?.action = #selector(done)
+            }
+            navigationItem.rightBarButtonItem = barButtonItem
         } else {
             
             let cancelButton = UIBarButtonItem(title: YPConfig.wordings.cancel,

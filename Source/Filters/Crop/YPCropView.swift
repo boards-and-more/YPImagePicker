@@ -25,6 +25,8 @@ final class YPCropView: UIView {
         didSet {
             toolbar.isHidden = hideToolbar
             toolbarHeightConstraint?.constant = hideToolbar ? 0 : Self.toolbarHeight
+            toolbarAtSafeArea?.isActive = !hideToolbar
+            toolbarAtBottom?.isActive = hideToolbar
         }
     }
     
@@ -40,6 +42,8 @@ final class YPCropView: UIView {
     }
 
     private var toolbarHeightConstraint: NSLayoutConstraint?
+    private var toolbarAtSafeArea: NSLayoutConstraint?
+    private var toolbarAtBottom: NSLayoutConstraint?
     
     convenience init(image: UIImage) {
         
@@ -119,8 +123,9 @@ final class YPCropView: UIView {
         )
     
         toolbarHeightConstraint = (toolbar.Height == Self.toolbarHeight)
-        
-        toolbar.Bottom == safeAreaLayoutGuide.Bottom
+        toolbarAtSafeArea = (toolbar.Bottom == safeAreaLayoutGuide.Bottom)
+        toolbarAtBottom = (toolbar.Bottom == Bottom)
+        toolbarAtBottom?.isActive = false
                 
         let complementRatio: CGFloat = CGFloat(1.0 / ratio)
         cropArea.Height == cropArea.Width * complementRatio
